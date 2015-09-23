@@ -1,5 +1,8 @@
-osTicket
+osTicket - DSD Edition
 ========
+
+<strong>Please see the <a href="https://github.com/SC-DSD/osTicket-DSD-Edition/wiki/Features-to-bring-back-from-an-older-customized-version">Features to bring back from an older customized version</a> section of the wiki for information regarding the DSD add-ons.</strong>
+
 <a href="http://osticket.com"><img src="http://osticket.com/sites/default/files/osTicket.jpg"
 align="left" hspace="10" vspace="6"></a>
 
