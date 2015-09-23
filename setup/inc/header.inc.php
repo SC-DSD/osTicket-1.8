@@ -9,11 +9,11 @@ if (($lang = Internationalization::getCurrentLanguage())
 <head>
     <title><?php echo $wizard['title']; ?></title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <link rel="stylesheet" href="css/wizard.css">
-    <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/flags.css">
-    <script type="text/javascript" src="../js/jquery-1.8.3.min.js"></script>
-    <script type="text/javascript" src="js/tips.js"></script>
-    <script type="text/javascript" src="js/setup.js"></script>
+    <link rel="stylesheet" href="css/wizard.css?19292ad"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/flags.css?19292ad"/>
+    <script type="text/javascript" src="../js/jquery-1.8.3.min.js?19292ad"></script>
+    <script type="text/javascript" src="js/tips.js?19292ad"></script>
+    <script type="text/javascript" src="js/setup.js?19292ad"></script>
 </head>
 <body>
     <div id="wizard">

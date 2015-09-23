@@ -5,7 +5,7 @@ $signin_url = ROOT_PATH . "login.php"
     . ($thisclient ? "?e=".urlencode($thisclient->getEmail()) : "");
 $signout_url = ROOT_PATH . "logout.php?auth=".$ost->getLinkToken();
 
-header("Content-Type: text/html; charset=UTF-8\r\n");
+header("Content-Type: text/html; charset=UTF-8");
 ?>
 <!DOCTYPE html>
 <html <?php
@@ -21,27 +21,27 @@ if (($lang = Internationalization::getCurrentLanguage())
     <meta name="description" content="customer support platform">
     <meta name="keywords" content="osTicket, Customer support system, support ticket system">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-	<link rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/osticket.css" media="screen">
-    <link rel="stylesheet" href="<?php echo ASSETS_PATH; ?>css/theme.css" media="screen">
-    <link rel="stylesheet" href="<?php echo ASSETS_PATH; ?>css/print.css" media="print">
-    <link rel="stylesheet" href="<?php echo ROOT_PATH; ?>scp/css/typeahead.css"
+	<link rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/osticket.css?19292ad" media="screen"/>
+    <link rel="stylesheet" href="<?php echo ASSETS_PATH; ?>css/theme.css?19292ad" media="screen"/>
+    <link rel="stylesheet" href="<?php echo ASSETS_PATH; ?>css/print.css?19292ad" media="print"/>
+    <link rel="stylesheet" href="<?php echo ROOT_PATH; ?>scp/css/typeahead.css?19292ad"
          media="screen" />
-    <link type="text/css" href="<?php echo ROOT_PATH; ?>css/ui-lightness/jquery-ui-1.10.3.custom.min.css"
+    <link type="text/css" href="<?php echo ROOT_PATH; ?>css/ui-lightness/jquery-ui-1.10.3.custom.min.css?19292ad"
         rel="stylesheet" media="screen" />
-    <link rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/thread.css" media="screen">
-    <link rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/redactor.css" media="screen">
-    <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/font-awesome.min.css">
-    <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/flags.css">
-    <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/rtl.css"/>
-    <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/jquery-1.8.3.min.js"></script>
-    <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/jquery-ui-1.10.3.custom.min.js"></script>
-    <script src="<?php echo ROOT_PATH; ?>js/osticket.js"></script>
-    <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/filedrop.field.js"></script>
-    <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/jquery.multiselect.min.js"></script>
-    <script src="<?php echo ROOT_PATH; ?>scp/js/bootstrap-typeahead.js"></script>
-    <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/redactor.min.js"></script>
-    <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/redactor-osticket.js"></script>
-    <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/redactor-fonts.js"></script>
+    <link rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/thread.css?19292ad" media="screen"/>
+    <link rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/redactor.css?19292ad" media="screen"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/font-awesome.min.css?19292ad"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/flags.css?19292ad"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/rtl.css?19292ad"/>
+    <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/jquery-1.8.3.min.js?19292ad"></script>
+    <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/jquery-ui-1.10.3.custom.min.js?19292ad"></script>
+    <script src="<?php echo ROOT_PATH; ?>js/osticket.js?19292ad"></script>
+    <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/filedrop.field.js?19292ad"></script>
+    <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/jquery.multiselect.min.js?19292ad"></script>
+    <script src="<?php echo ROOT_PATH; ?>scp/js/bootstrap-typeahead.js?19292ad"></script>
+    <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/redactor.min.js?19292ad"></script>
+    <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/redactor-osticket.js?19292ad"></script>
+    <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/redactor-fonts.js?19292ad"></script>
     <?php
     if($ost && ($headers=$ost->getExtraHeaders())) {
         echo "\n\t".implode("\n\t", $headers)."\n";
@@ -51,11 +51,6 @@ if (($lang = Internationalization::getCurrentLanguage())
 <body>
     <div id="container">
         <div id="header">
-            <a class="pull-left" id="logo" href="<?php echo ROOT_PATH; ?>index.php"
-            title="<?php echo __('Support Center'); ?>"><img src="<?php
-                echo ROOT_PATH; ?>logo.php" border=0 alt="<?php
-                echo $ost->getConfig()->getTitle(); ?>"
-                style="height: 5em"></a>
             <div class="pull-right flush-right">
             <p>
              <?php
@@ -95,6 +90,12 @@ if (($all_langs = Internationalization::availableLanguages())
 } ?>
             </p>
             </div>
+            <a class="pull-left" id="logo" href="<?php echo ROOT_PATH; ?>index.php"
+            title="<?php echo __('Support Center'); ?>">
+                <span class="valign-helper"></span>
+                <img src="<?php echo ROOT_PATH; ?>logo.php" border=0 alt="<?php
+                echo $ost->getConfig()->getTitle(); ?>">
+            </a>
         </div>
         <div class="clear"></div>
         <?php

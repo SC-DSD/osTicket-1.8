@@ -14,6 +14,7 @@
     vim: expandtab sw=4 ts=4 sts=4:
 **********************************************************************/
 
+include_once INCLUDE_DIR.'class.charset.php';
 
 class Format {
 
@@ -40,47 +41,13 @@ class Format {
         return $size;
     }
 
-	/* encode text into desired encoding - taking into accout charset when available. */
-    function encode($text, $charset=null, $encoding='utf-8') {
-
-        //Try auto-detecting charset/encoding
-        if (!$charset && function_exists('mb_detect_encoding'))
-            $charset = mb_detect_encoding($text);
-
-        // Cleanup - incorrect, bogus, or ambiguous charsets
-        // ISO-8859-1 is assumed for empty charset.
-        if (!$charset || in_array(strtolower(trim($charset)),
-                array('default','x-user-defined','iso','us-ascii')))
-            $charset = 'ISO-8859-1';
-
-        $original = $text;
-        if (function_exists('iconv'))
-            $text = iconv($charset, $encoding.'//IGNORE', $text);
-        elseif (function_exists('mb_convert_encoding'))
-            $text = mb_convert_encoding($text, $encoding, $charset);
-        elseif (!strcasecmp($encoding, 'utf-8')
-                && function_exists('utf8_encode')
-                && !strcasecmp($charset, 'ISO-8859-1'))
-            $text = utf8_encode($text);
-
-        // If $text is false, then we have a (likely) invalid charset, use
-        // the original text and assume 8-bit (latin-1 / iso-8859-1)
-        // encoding
-        return (!$text && $original) ? $original : $text;
-    }
-
-    //Wrapper for utf-8 encoding.
-    function utf8encode($text, $charset=null) {
-        return Format::encode($text, $charset, 'utf-8');
-    }
-
     function mimedecode($text, $encoding='UTF-8') {
 
         if(function_exists('imap_mime_header_decode')
                 && ($parts = imap_mime_header_decode($text))) {
             $str ='';
             foreach ($parts as $part)
-                $str.= Format::encode($part->text, $part->charset, $encoding);
+                $str.= Charset::transcode($part->text, $part->charset, $encoding);
 
             $text = $str;
         } elseif($text[0] == '=' && function_exists('iconv_mime_decode')) {
@@ -105,7 +72,7 @@ class Format {
                 $filename, $match))
             // XXX: Currently we don't care about the language component.
             //      The  encoding hint is sufficient.
-            return self::utf8encode(urldecode($match[3]), $match[1]);
+            return Charset::utf8(urldecode($match[3]), $match[1]);
         else
             return $filename;
     }
@@ -148,11 +115,79 @@ class Format {
         return $len ? wordwrap($text, $len, "\n", true) : $text;
     }
 
-    function html($html, $config=array('balance'=>1)) {
+    function html_balance($html, $remove_empty=true) {
+        if (!extension_loaded('dom'))
+            return $html;
+
+        if (!trim($html))
+            return $html;
+
+        $doc = new DomDocument();
+        $xhtml = '<?xml encoding="utf-8"><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>'
+            // Wrap the content in a <div> because libxml would use a <p>
+            . "<div>$html</div>";
+        $doc->encoding = 'utf-8';
+        $doc->preserveWhitespace = false;
+        $doc->recover = true;
+        if (false === @$doc->loadHTML($xhtml))
+            return $html;
+
+        if ($remove_empty) {
+            // Remove empty nodes
+            $xpath = new DOMXPath($doc);
+            static $eE = array('area'=>1, 'br'=>1, 'col'=>1, 'embed'=>1,
+                'hr'=>1, 'img'=>1, 'input'=>1, 'isindex'=>1, 'param'=>1);
+            do {
+                $done = true;
+                $nodes = $xpath->query('//*[not(text()) and not(node())]');
+                foreach ($nodes as $n) {
+                    if (isset($eE[$n->nodeName]))
+                        continue;
+                    $n->parentNode->removeChild($n);
+                    $done = false;
+                }
+            } while (!$done);
+        }
+
+        static $phpversion;
+        if (!isset($phpversion))
+            $phpversion = phpversion();
+
+        $body = $doc->getElementsByTagName('body');
+        if (!$body->length)
+            return $html;
+
+        if ($phpversion > '5.3.6') {
+            $html = $doc->saveHTML($doc->getElementsByTagName('body')->item(0)->firstChild);
+        }
+        else {
+            $html = $doc->saveHTML();
+            $html = preg_replace('`^<!DOCTYPE.+?>|<\?xml .+?>|</?html>|</?body>|</?head>|<meta .+?/?>`', '', $html); # <?php
+        }
+        return preg_replace('`^<div>|</div>$`', '', trim($html));
+    }
+
+    function html($html, $config=array()) {
         require_once(INCLUDE_DIR.'htmLawed.php');
         $spec = false;
         if (isset($config['spec']))
             $spec = $config['spec'];
+
+        // Add in htmLawed defaults
+        $config += array(
+            'balance' => 1,
+        );
+
+        // Attempt to balance using libxml. htmLawed will corrupt HTML with
+        // balancing to fix improper HTML at the same time. For instance,
+        // some email clients may wrap block elements inside inline
+        // elements. htmLawed will change such block elements to inlines to
+        // make the HTML correct.
+        if ($config['balance'] && extension_loaded('dom')) {
+            $html = self::html_balance($html);
+            $config['balance'] = 0;
+        }
+
         return htmLawed($html, $config, $spec);
     }
 
@@ -233,7 +268,7 @@ class Format {
         }
     }
 
-    function safe_html($html) {
+    function safe_html($html, $balance=1) {
         // Remove HEAD and STYLE sections
         $html = preg_replace(
             array(':<(head|style|script).+?</\1>:is', # <head> and <style> sections
@@ -245,14 +280,14 @@ class Format {
             $html);
         $config = array(
             'safe' => 1, //Exclude applet, embed, iframe, object and script tags.
-            'balance' => 1, //balance and close unclosed tags.
+            'balance' => $balance,
             'comment' => 1, //Remove html comments (OUTLOOK LOVE THEM)
             'tidy' => -1,
             'deny_attribute' => 'id',
             'schemes' => 'href: aim, feed, file, ftp, gopher, http, https, irc, mailto, news, nntp, sftp, ssh, telnet; *:file, http, https; src: cid, http, https, data',
             'hook_tag' => function($e, $a=0) { return Format::__html_cleanup($e, $a); },
             'elements' => '*+iframe',
-            'spec' => 'iframe=-*,height,width,type,src(match="`^(https?:)?//(www\.)?(youtube|dailymotion|vimeo)\.com/`i"),frameborder; div=data-mid',
+            'spec' => 'iframe=-*,height,width,type,src(match="`^(https?:)?//(www\.)?(youtube|dailymotion|vimeo)\.com/`i"),frameborder',
         );
 
         return Format::html($html, $config);
@@ -261,7 +296,7 @@ class Format {
     function localizeInlineImages($text) {
         // Change file.php urls back to content-id's
         return preg_replace(
-            '/src="(?:\/[^"]+?)?\/file\\.php\\?(?:\w+=[^&]+&(?:amp;)?)*?key=([^&]+)[^"]*/',
+            '`src="(?:https?:/)?(?:/[^/"]+)*?/file\\.php\\?(?:\w+=[^&]+&(?:amp;)?)*?key=([^&]+)[^"]*`',
             'src="cid:$1', $text);
     }
 
@@ -328,6 +363,7 @@ class Format {
             $text);
 
         //make urls clickable.
+        $text = self::html_balance($text, false);
         $text = Format::clickableurls($text);
 
         if ($inline_images)
@@ -399,6 +435,7 @@ class Format {
             },
             'schemes' => 'href: aim, feed, file, ftp, gopher, http, https, irc, mailto, news, nntp, sftp, ssh, telnet; *:file, http, https; src: cid, http, https, data',
             'elements' => '*+iframe',
+            'balance' => 0,
             'spec' => 'span=data-src,width,height',
         );
         return Format::html($text, $config);
@@ -555,7 +592,7 @@ class Format {
                 $contents = base64_decode($contents);
         }
         if ($output_encoding && $charset)
-            $contents = Format::encode($contents, $charset, $output_encoding);
+            $contents = Charset::transcode($contents, $charset, $output_encoding);
 
         return array(
             'data' => $contents,
@@ -603,7 +640,7 @@ class Format {
         // Drop leading and trailing whitespace
         $text = trim($text);
 
-        if (class_exists('IntlBreakIterator')) {
+        if (false && class_exists('IntlBreakIterator')) {
             // Split by word boundaries
             if ($tokenizer = IntlBreakIterator::createWordInstance(
                     $lang ?: ($cfg ? $cfg->getSystemLanguage() : 'en_US'))

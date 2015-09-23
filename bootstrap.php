@@ -29,8 +29,8 @@ class Bootstrap {
         error_reporting($error_reporting); //Respect whatever is set in php.ini (sysadmin knows better??)
 
         #Don't display errors
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
+        ini_set('display_errors', '0'); // Set by installer
+        ini_set('display_startup_errors', '0'); // Set by installer
 
         //Default timezone
         if (!ini_get('date.timezone')) {
@@ -199,6 +199,9 @@ class Bootstrap {
     }
 
     function i18n_prep() {
+        ini_set('default_charset', 'utf-8');
+        ini_set('output_encoding', 'utf-8');
+
         // MPDF requires mbstring functions
         if (!extension_loaded('mbstring')) {
             if (function_exists('iconv')) {
@@ -289,7 +292,7 @@ $here = ($h = realpath($here)) ? $h : $here;
 define('ROOT_DIR',str_replace('\\', '/', $here.'/'));
 unset($here); unset($h);
 
-define('INCLUDE_DIR',ROOT_DIR.'include/'); //Change this if include is moved outside the web path.
+define('INCLUDE_DIR', ROOT_DIR . 'include/'); // Set by installer
 define('PEAR_DIR',INCLUDE_DIR.'pear/');
 define('SETUP_DIR',ROOT_DIR.'setup/');
 
@@ -299,8 +302,9 @@ define('I18N_DIR', INCLUDE_DIR.'i18n/');
 /*############## Do NOT monkey with anything else beyond this point UNLESS you really know what you are doing ##############*/
 
 #Current version && schema signature (Changes from version to version)
-define('THIS_VERSION','1.8-git'); //Shown on admin panel
-define('GIT_VERSION','$git');
+define('THIS_VERSION', 'v1.9.12'); // Set by installer
+define('GIT_VERSION', '19292ad'); // Set by installer
+define('MAJOR_VERSION', '1.9');
 //Path separator
 if(!defined('PATH_SEPARATOR')){
     if(strpos($_ENV['OS'],'Win')!==false || !strcasecmp(substr(PHP_OS, 0, 3),'WIN'))
