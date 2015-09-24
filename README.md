@@ -1,7 +1,13 @@
 # osTicket-DSD-Edition
-DSD's add-ons repo
-This branch is concerned about adding the availability module. Will require the following dependecies to be fullfilled:
-+Leaves
+DSD's add-ons repo.
 
-Potentially:
-+Verify includes integrity
+
+<p>This branch is concerned about adding the availability module. Will require the following dependecies to be fullfilled:</p>
+<ul>
+<li>Leaves</li>
+</ul>
+
+<p>Potentially:</p>
+<ul>
+<li>Verify includes integrity</li>
+</ul>
