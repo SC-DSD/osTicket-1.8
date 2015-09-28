@@ -1,4 +1,7 @@
 <?php
+
+/* Let's try ignore */
+
 require('staff.inc.php');
 require_once(INCLUDE_DIR.'class.leave.php');
 
