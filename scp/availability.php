@@ -1,6 +1,6 @@
 <?php
 
-/* Let's try ignore */
+/* Let's try ignore ...um?*/
 
 require('staff.inc.php');
 require_once(INCLUDE_DIR.'class.leave.php');
