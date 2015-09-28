@@ -1,6 +1,7 @@
 .htaccess
 php53.cgi
 include/ost-config.php
+scp/i_dont_want_this_added_to_git.php
 setup/cli/modules/importer
 *.sw[a-z]
 .DS_Store
